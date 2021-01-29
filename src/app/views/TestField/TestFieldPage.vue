@@ -17,11 +17,11 @@
 <script lang="ts">
 import { Component, Watch, Vue} from "vue-property-decorator";
 
-import { adminTestService} from "@/app/components/test/ApiRequest";
+import { adminService} from "@/app/services/AdminService";
 import { errorService } from "@/app/services/ErrorService";
 import { rootStoreModule } from "@/app/store/root";
 
-import TestField from "@/app/components/test/TestField.vue"
+import TestField from "@/app/components/TestField/TestField.vue"
 import { User } from "@/app/models/user/User";
 
 import { PageOptions } from "@/app/models/pagination/PageOptions";
@@ -67,7 +67,7 @@ export default class AdminDashboard extends Vue{
     async getAllUsers(){
         this.isTableDataLoading = true;
         try{
-            const { content, totalUsers } = await adminTestService.getAllUsers(this.options);
+            const { content, totalUsers } = await adminService.getAllUsers(this.options);
 
             const reworkContent = this.gestionRoles(content)
             this.allUsers = reworkContent;

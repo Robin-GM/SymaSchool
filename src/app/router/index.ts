@@ -10,7 +10,7 @@ import ProfilePage from '@/app/views/ProfilePage.vue';
 import NotFoundPage from '@/app/views/NotFoundPage.vue';
 import UserSelectedProfilePage from '@/app/views/UserSelectedProfilePage.vue';
 import CloudPage from '@/app/views/Cloud/CloudPage.vue';
-import TestField from '@/app/views/Test/TestFieldPage.vue';
+import TestField from '@/app/views/TestField/TestFieldPage.vue';
 
 import StudentTeacherDashboard from '@/app/views/StudentTeacherPages/StudentTeacherDashboard.vue'
 
