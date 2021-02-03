@@ -3,12 +3,16 @@
 
         <div class="zone">
             <div class="zoneBtn">
-                <v-btn class="btn text-capitalize px-2" color="orange" large>
-                    Créer un Dossier
-                </v-btn>
+                <v-btn class="btn text-capitalize px-2" color="orange" large>Créer un Dossier</v-btn>
 
                 <v-btn class="btn text-capitalize px-2" color="orange" large>Nouveau Fichier</v-btn>
             </div>
+
+            <div class="dragZone" @drop.prevent="addFile" @dragover.prevent>
+                <p>Fichier à enregistrer (Glissez-le ici..)</p>
+            </div>
+
+
             <p class="txt">Dossiers</p>
 
             <div class="filesContains">
@@ -172,6 +176,12 @@ export default class Interface extends Vue{
     .btn{
         font-weight: 400;
         font-size: 15px;
+    }
+
+    .dragZone{
+        border: 1px solid grey ;
+        height: 70px;
+        width: 70%;
     }
 
     .txt{
