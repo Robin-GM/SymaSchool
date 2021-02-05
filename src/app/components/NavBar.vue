@@ -45,6 +45,7 @@
                         v-for="item in navigationLinks.disconnectedMenu"
                         :key="item.title"
                         :to="{ name : item.to}"
+                        exact
                     >{{item.title}}</router-link>
                 </ul>
 
@@ -54,103 +55,10 @@
                     <LocaleSelect/>
                 </div>
 
-                <div class="text-center ml-5">
-                    <v-menu
-                        class="menu-profil"
-                        v-model="profile"
-                        :close-on-content-click="true"
-                        offset-y 
-                        nudge-bottom="22"
-                        rounded="lg"
-                        transition="slide-y-transition"
-                    >
-                        <template v-slot:activator="{ on, attrs }">
-                            <!-- Si l'avatar a pu être récupéré on l'affiche -->
-                            <img v-if="userAvatar" 
-                                :src="userAvatar" 
-                                alt="user avatar"
-                                height="32"
-                                width="32"
-                                rounded-circle
-                            />
-                            <!-- Sinon on affiche la première lettre du prénom -->
-                            <v-avatar v-else
-                                class="white--text text-uppercase"
-                                color="orange"
-                                size="32"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                            {{authenticatedUser.prenom[0]}}
-                            </v-avatar>
-                        </template>
-                        <v-card class="profil-container d-flex flex-column text-center">
-                            <div class="mx-4">
-                                <div>
-                                    <v-badge
-                                        @click="redirectToProfilePage"
-                                        icon="mdi-pencil"
-                                        color="grey"
-                                        bottom
-                                        bordered
-                                        offset-x="20"
-                                        offset-y="35"
-                                    >
-                                        <!-- Si l'avatar a pu être récupéré on l'affiche -->
-                                        <img v-if="userAvatar" 
-                                            :src="userAvatar" 
-                                            alt="user avatar"
-                                            height="70"
-                                            width="70"
-                                            rounded-circle
-                                        />
-                                        <!-- Sinon on affiche les initiales -->
-                                        <v-avatar v-else
-                                            class="avatar-name white--text my-4 text-uppercase"
-                                            color="orange"
-                                            size="70">
-                                            {{ authenticatedUser.initials }}
-                                        </v-avatar>
-                                    </v-badge>
-                                    
-                                </div>
-                                <div>
-                                    <div class="name font-weight-medium text-capitalize">
-                                        {{authenticatedUser.prenom}} {{authenticatedUser.nom}}
-                                    </div>
-                                    <div class="email grey--text text--darken-2">
-                                        {{authenticatedUser.email}}
-                                    </div>
-                                    <v-btn
-                                        @click="redirectToProfilePage"
-                                        class="edit-btn grey--text text--darken-2 text-capitalize my-4 mb-5"
-                                        rounded
-                                        outlined
-                                        depressed
-                                        small
-                                    >
-                                        {{ $t("navBar.editAccount") }}
-                                    </v-btn>
-                                </div>
-                            </div>
-
-                            <v-divider></v-divider>
-
-                            <div>
-                                <v-btn 
-                                    @click="onLogout"
-                                    class="logout-btn grey--text text--darken-2 text-capitalize my-4"
-                                    outlined
-                                    depressed
-                                >
-                                    {{ $t("navBar.signout") }}
-                                </v-btn>
-                            </div>
-
-                        </v-card>
-                    </v-menu>
+                <div v-if="isConnected">
+                    <ProfileCardMenu
+                        :authenticatedUser="authenticatedUser"/>
                 </div>
-
             </div>
 
             
@@ -179,10 +87,7 @@
 
                     <v-divider></v-divider>
 
-                    <v-list
-                        nav
-                        dense
-                    >
+                    <v-list nav dense>
                         <v-list-item-group
                             v-model="group"
                             active-class="orange--text text--accent-4"
@@ -236,11 +141,13 @@ import { RouteNameConstants } from "@/app/constants/RouteNameConstants";
 import { RoleCodeConstants } from "@/app/constants/RoleCodeConstants";
 import { AuthenticatedUser } from "@/app/models/auth/AuthenticatedUser";
 import LocaleSelect from "./LocaleSelect.vue";
+import ProfileCardMenu from "./Profile/ProfileCardMenu.vue";
 import { router } from '../router';
 
 @Component({
   components: {
-    LocaleSelect
+    LocaleSelect,
+    ProfileCardMenu
   }
 })
 export default class NavBar extends Vue{
@@ -267,8 +174,8 @@ export default class NavBar extends Vue{
         },
 
         disconnectedMenu : [
-            { title: this.$t("navBar.home"), to: RouteNameConstants.HOME, icon: mdiHome},
-            { title: this.$t("navBar.login"), to: RouteNameConstants.LOGIN, icon: mdiLoginVariant},
+            { title: this.$t("navBar.home"), redirectTo: this.redirectToHome, to: RouteNameConstants.HOME, icon: mdiHome},
+            { title: this.$t("navBar.login"), redirectTo: this.redirectToLoginPage, to: RouteNameConstants.LOGIN, icon: mdiLoginVariant},
         ]
     }
 
@@ -276,9 +183,6 @@ export default class NavBar extends Vue{
     //Gestion du responsive display
     hamburguer = false;
     group = null;
-
-    //affichage du profil
-    profile = false
 
     icons = {
             mdiHome,
@@ -300,11 +204,6 @@ export default class NavBar extends Vue{
         return authStoreModule.user;
     }
 
-    //Obtenir l'avatar de l'utilisateur (pas encore implémenté donc renvoie ses initiales)
-    get userAvatar(): string | null {
-    return authStoreModule.userAvatar ?? null;
-    }
-
     getUserPrenom(){
         if(this.authenticatedUser != null){
             return this.authenticatedUser.prenom;
@@ -318,7 +217,6 @@ export default class NavBar extends Vue{
     onLogout() {
         authStoreModule.logout();
         this.redirectToHome();
-        this.profile = false
     }
 
     redirectToLoginPage() {
@@ -361,27 +259,6 @@ export default class NavBar extends Vue{
 
     .boite .symaschool{
         font-size: 1.1rem;
-    }
-
-    .profil-container{
-        min-width: 300px;
-    }
-    .avatar-name{
-        font-size: 35px;
-        font-weight: 400;
-    }
-    .name{
-        font-size: 16px;
-    }
-    .email{
-        font-size: 14px;
-        font-weight: 400;
-    }
-    .edit-btn, 
-    .logout-btn{
-        font-size: 12px;
-        font-weight: 600;
-        border: 1px solid #dadce0;
     }
 
     /* --NAVBAR-- */

@@ -12,6 +12,14 @@ class CloudService {
         return await apiService.get(`${CloudService.ENDPOINT_CLOUD}/getContent`, params);
     }
 
+    //modifyName(dirName | fileName, newName)
+    //createDir(dirName, pathLocationName)
+    //deleteDir
+    //addNewFile(file: File, pathLocationName)
+    //changeDirFile(fileName, newPath, oldPath)
+    //deleteFile(fileName, pathName)
+    //downloadFile(fileName, pathName)
+
 }
 
 export const cloudService = new CloudService();

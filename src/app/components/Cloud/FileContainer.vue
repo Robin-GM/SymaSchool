@@ -1,26 +1,26 @@
 <template>
     <div class="container"
         @click="getFolderPath"
-    >
+        draggable="true"
+    >   <!-- @Rightclick -->
+        <!-- @click="prevualiziseDocument" (if type != FOLDER) -->
+
         <div class="icone">
-            <v-icon size="30" color="grey darken-2">{{ this.getIcon() }}</v-icon>
+            <v-icon size="25" color="grey">{{ icons[file.type] }}</v-icon>
         </div>
 
         <div class="infos">
             <div class="name">
-                {{this.file.name}}
+                {{file.name}}
             </div>
             <div class="size">
-                <!-- {{this.getSize()}} -->
                 {{ getSize }}
             </div>
         </div>
-
     </div>
 </template>
 <script lang="ts">
 import { Component, Prop, Emit, Vue } from "vue-property-decorator";
-import { mdiFolder, mdiFilePdfBox, mdiFile, } from '@mdi/js';
 
 import { TypeFileConstants } from "@/app/constants/Cloud/TypeFileConstants";
 import { File } from "@/app/models/cloud/File"
@@ -33,19 +33,25 @@ export default class FileContainer extends Vue{
     @Prop({ type: Object, required: true })
     readonly file!: File;
 
-    /* getSize(){
-        if (this.file.type == TypeFileConstants.FOLDER){
-            return this.file.size + " fichiers";
-        }
-        
-        else {
-            return this.file.size + " mo";
-        }
-    } */
+    icons = {
+        Folder: 'mdi-folder',
+        pdf: 'mdi-file-pdf',
+        txt: 'mdi-file-document-outline',
+        xls: 'mdi-file-excel',
+        ppt: 'mdi-file-powerpoint',
+        png: 'mdi-file-image',
+        jpg: 'mdi-file-image',
+        jpeg: 'mdi-file-image',
+        mp4: 'mdi-file-video'
+    };
 
     get getSize(){
         if (this.file.type == TypeFileConstants.FOLDER){
-            return this.file.size + " fichiers";
+            if (this.file.size == 0){
+                return "Vide";
+            }else{
+                return this.file.size + " fichier(s)";
+            }
         }
         else{
             if (this.file.size < 1000) {
@@ -60,33 +66,16 @@ export default class FileContainer extends Vue{
         }
     }
 
-    //Obtenir l'icone correspondant au type de l'élément
-    getIcon(){
-        if (this.file.type == TypeFileConstants.FOLDER){
-            return this.icons.mdiFolder;
-        }
-        else if (this.file.type == TypeFileConstants.PDF){
-            return this.icons.mdiFilePdfBox;
-        }
-        else {
-            return this.icons.mdiFile;
-        }
-    }
-
+    //emet le nom du dossier pour s'y rendre
     @Emit("path")
     getFolderPath(): string{
         const fileName = this.file.name;
         return fileName;
     }
 
-    icons = {
-            mdiFolder,
-            mdiFilePdfBox,
-            mdiFile,
-        };
 
-    //TODO afficher le chemin dans la zone jaune
-    //TODO au survol afficher el nom complet de l'élément-
+    //TODO afficher le chemin dans la zone jaune                : DONE
+    //TODO au survol afficher le nom complet de l'élément-
 
 }
 </script>
@@ -106,6 +95,7 @@ export default class FileContainer extends Vue{
 
     .container:hover{
         cursor: pointer;
+        background-color: #ed8e001c;
     }
 
     .icone{
@@ -119,6 +109,7 @@ export default class FileContainer extends Vue{
     .infos{
         height: 100%;
         width: 100%;
+        margin-right: 5px;
 
         overflow:hidden; 
         white-space:nowrap; 
@@ -127,5 +118,12 @@ export default class FileContainer extends Vue{
     .infos .name{
         overflow:hidden; 
         text-overflow: ellipsis;
+        font-size: 1em;
+        font-weight: 500;
+        color: rgb(75, 75, 75);
+    }
+    .infos .size{
+        font-size: 0.85em;
+        color: rgb(97, 97, 97);
     }
 </style>

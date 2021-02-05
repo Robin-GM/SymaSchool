@@ -37,6 +37,7 @@ class LanguageService {
     apiService.setRequestAcceptLanguageHeader(locale);
   }
 
+  //retourne la liste des langues proposées
   getAllLanguage(): Language[] {
     return Object.keys(LanguageCode).map((code) => {
       return new Language(

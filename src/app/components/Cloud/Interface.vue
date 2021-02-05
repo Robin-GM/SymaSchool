@@ -8,10 +8,6 @@
                 <v-btn class="btn text-capitalize px-2" color="orange" large>Nouveau Fichier</v-btn>
             </div>
 
-            <div class="dragZone" @drop.prevent="addFile" @dragover.prevent>
-                <p>Fichier à enregistrer (Glissez-le ici..)</p>
-            </div>
-
 
             <p class="txt">Dossiers</p>
 
@@ -23,8 +19,7 @@
                     v-for="file in foldersElements"
                     :key="file.name"
                 />
-            </div>
-            
+            </div>  
         </div>
 
         <div class="zone">
@@ -176,12 +171,6 @@ export default class Interface extends Vue{
     .btn{
         font-weight: 400;
         font-size: 15px;
-    }
-
-    .dragZone{
-        border: 1px solid grey ;
-        height: 70px;
-        width: 70%;
     }
 
     .txt{
