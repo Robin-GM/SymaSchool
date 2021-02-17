@@ -1,20 +1,22 @@
 <template>
-    <div class="container"
-        @click="getFolderPath"
-        draggable="true"
-    >   <!-- @Rightclick -->
-        <!-- @click="prevualiziseDocument" (if type != FOLDER) -->
+    <div>
+        <div class="container"
+            @click="getFolderPath"
+            draggable="true"
+        >
+            <!-- @click="prevualiziseDocument" (if type != FOLDER) -->
 
-        <div class="icone">
-            <v-icon size="25" color="grey">{{ icons[file.type] }}</v-icon>
-        </div>
-
-        <div class="infos">
-            <div class="name">
-                {{file.name}}
+            <div class="icone">
+                <v-icon size="25" color="grey">{{ icons[file.type] }}</v-icon>
             </div>
-            <div class="size">
-                {{ getSize }}
+
+            <div class="infos">
+                <div class="name">
+                    {{file.name}}
+                </div>
+                <div class="size">
+                    {{ getSize }}
+                </div>
             </div>
         </div>
     </div>
@@ -66,11 +68,10 @@ export default class FileContainer extends Vue{
         }
     }
 
-    //emet le nom du dossier pour s'y rendre
+    //emet le chemin du dossier ou l'on souhaite se rendre
     @Emit("path")
     getFolderPath(): string{
-        const fileName = this.file.name;
-        return fileName;
+        return this.file.path;
     }
 
 
@@ -95,7 +96,7 @@ export default class FileContainer extends Vue{
 
     .container:hover{
         cursor: pointer;
-        background-color: #ed8e001c;
+        background-color: rgba(245, 245, 245, 0.678);
     }
 
     .icone{

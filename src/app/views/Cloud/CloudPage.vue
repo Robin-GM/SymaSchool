@@ -9,7 +9,7 @@
 
             <div class="nav_path">
 
-                <v-icon @click="goBackward" size="30" class="ml-2">mdi-arrow-left-bold-circle-outline</v-icon>
+                <!-- <v-icon @click="goBackward" size="30" class="ml-2">mdi-arrow-left-bold-circle-outline</v-icon> -->
                 
                 <ul class="navList pl-0">
                     <li v-for="(directory, index) in navigation" :key="index" class="mr-1 ml-0">
@@ -87,7 +87,7 @@ export default class CloudPage extends Vue{
         console.log("getPathToBack  :" + this.newPathToBackward)
     }
 
-    //méthode appelée quand on clique sur le bouton retour arrière
+/*     //méthode appelée quand on clique sur le bouton retour arrière
     //prends le currentPath, et enlève le dernier repertoire pour obtenir le path du repertoire précédent
     //passe ce nouveau repertoire à la variable newPathToBackward qui est passée en Prop de l'interface
     goBackward(){
@@ -96,7 +96,7 @@ export default class CloudPage extends Vue{
         //on supprime le dernier charactère du nouveau path qui est un "/"
         path.slice(0, -1);
         this.newPathToBackward = path;
-    }
+    } */
 
     //sécurité pour s'assurer que l'utilisateur soit bien connecté (peut-être inutil)
     mounted() {

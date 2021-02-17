@@ -3,9 +3,22 @@
 
         <div class="zone">
             <div class="zoneBtn">
-                <v-btn class="btn text-capitalize px-2" color="orange" large>Créer un Dossier</v-btn>
+                <v-btn 
+                    @click="dialogNewDirectory = true" 
+                    class="btn text-capitalize px-2" 
+                    color="orange" 
+                    large
+                >
+                    Créer un Dossier
+                </v-btn>
 
-                <v-btn class="btn text-capitalize px-2" color="orange" large>Nouveau Fichier</v-btn>
+                <v-btn 
+                    class="btn text-capitalize px-2" 
+                    color="orange" 
+                    large
+                >
+                    Nouveau Fichier
+                </v-btn>
             </div>
 
 
@@ -14,10 +27,10 @@
             <div class="filesContains">
                 <FileContainer
                     class="elt"
-                    :file="file"
                     @path="getNewPath"
                     v-for="file in foldersElements"
                     :key="file.name"
+                    :file="file"
                 />
             </div>  
         </div>
@@ -28,12 +41,52 @@
             <div class="filesContains">
                 <FileContainer
                     class="elt"
-                    :file="file"
                     v-for="file in filesElements"
                     :key="file.name"
+                    :file="file"
                 />
             </div>
         </div>
+        
+
+        <v-dialog v-model="dialogNewDirectory" width="390px">
+            <v-card class="pa-5">
+                <div class="d-flex justify-space-between">
+                    <div class="font-weight-medium">
+                        Nouveau dossier
+                    </div>
+                    <v-icon @click="dialogNewDirectory = false" size="17">mdi-window-close</v-icon>
+                </div>
+                <v-text-field 
+                    v-model="directoryName" 
+                    outlined 
+                    dense 
+                    color="orange"
+                    class="mt-5"
+                ></v-text-field>
+                <div class="d-flex justify-end">
+                    <v-btn 
+                        @click="dialogNewDirectory = false"
+                        class="py-4"
+                        depressed
+                        text
+                        small
+                    >
+                        Annuler
+                    </v-btn>
+                    <v-btn 
+                        @click="createNewDirectory"
+                        :loading="loading"
+                        color="orange"
+                        class="white--text py-4 ml-3"
+                        depressed
+                        small
+                    >
+                        Créer
+                    </v-btn>
+                </div>
+            </v-card>
+        </v-dialog>
 
     </div>
 </template>
@@ -61,24 +114,38 @@ export default class Interface extends Vue{
     goBackDirectory!: string;
 
 
+    //variable loading pour gérer les effets de chargement des composants
+    loading = false;
+
     //liste des éléments récupéré par la requête API
     files: File[] = [];
+
 
     //chemin ou l'on se trouve actuellement
     currentPath = "";
 
+
     //Nombre d'éléments remontés par la requête API
     numberFiles = 0;
 
-    //historique de tous les chemins pour pouvoir revenir en arrière
-    historicPath: string[] = [];
 
-    //chemin vers lequel on veut aller : nouvelle destination
+    //chemin vers lequel on veut aller (quand on clique sur un répertoire pour s'y rendre) : nouvelle destination
     newPath = "";
 
 
+    //variable pour gérer l'affichage de la fenêtre de création d'un répertoire
+    dialogNewDirectory = false;
+
+    //Nom du dossier à ajouter : valeur par défaut
+    directoryName = "Dossier sans titre";
+
+    //valeur par défaut pour réinitialiser
+    defaultDirName = "Dossier sans titre";
+
+
+
     //Au chargement de la page, on appelle la fonction getFiles
-    async created(){
+    async mounted(){
         try{
             await this.getContent();
         }catch (error) {
@@ -86,6 +153,8 @@ export default class Interface extends Vue{
             rootStoreModule.setErrorMessage(errorMessage);
         }
     }
+
+
 
     //Méthode qui requête au back et fait remonter les éléments
     async getContent(){
@@ -95,12 +164,10 @@ export default class Interface extends Vue{
             this.files = content;
             this.numberFiles = numberFiles;
 
-            //on actualise la propriété currentPath avec le nouveau path
+            //on actualise la variable currentPath avec le nouveau path (qui devient le chemin actuel)
             this.currentPath = path;
-            this.historicPath.push(path)
 
             console.log("current path Child  :" + this.currentPath)
-
 
             //on appelle la fonction qui actualise le path de navigation dans le Parent
             this.navigationPath();
@@ -111,12 +178,37 @@ export default class Interface extends Vue{
         }
     }
 
-    //création du nouveau path quand on clique sur le dossier ou l'on souhaite entrer
-    getNewPath(fileName: string){
-        this.newPath = `${this.currentPath}/${fileName}`;
+    async createNewDirectory(){
+        this.loading = true
+        
+        //On constitue le chemin du nouveau dossier en ajoutant son nom au chemin actuel
+        const newDirPath = `${this.currentPath}/${this.directoryName}`
+        try{
+            await cloudService.createDirectory(newDirPath)
+
+            //on réinitialise la valeur de directoryName avec l'entrée par défaut
+            this.directoryName = this.defaultDirName;
+        }catch (error) {
+            const errorMessage = errorService.getErrorMessage(error);
+            rootStoreModule.setErrorMessage(errorMessage);
+        }finally {
+            this.loading = false;
+            this.dialogNewDirectory = false;
+            //on rafraichit la page pour que le dossier apparaisse
+            await this.getContent();
+        }
     }
 
-    //Surveille newPath : si sa valeur change alors la méthode est appelée
+
+
+    //récupère du composant enfant le chemin du répertoire ou l'on souhaite se rendre, et instancie la variable newPath avec ce chemin
+    getNewPath(filePath: string){
+        this.newPath = filePath;
+    }
+
+
+
+    //S'active si la valeur de newPath change : signifie que l'on souhaite se rendre dans un autre répertoire
     @Watch("newPath")
     async isThePathChanged(){
         //si le path actuel est différent du path souhaité alors on fait une requête
@@ -125,11 +217,15 @@ export default class Interface extends Vue{
         }
     }
 
+
+
     //émet le nouveau path pour actualiser le path de navigation dans le composant parent
     @Emit("newPathForNavigation")
     navigationPath(): string{
         return this.currentPath;
     }
+
+
 
     //Surveille le prop goBackDirectory : si sa valeur change (cela signifie qu'on veut retourner en arrière dans le path) alors on change newPath
     //Cela activera isThePathChanged() ce qui fera une nouvelle requête avec le nouveau path
@@ -142,16 +238,19 @@ export default class Interface extends Vue{
         }
     }
 
+
+
     //Ne retourne que les dossiers
     get foldersElements(){
         return this.files.filter(f => f.type == TypeFileConstants.FOLDER)
     }
 
+
+
     //Ne retourne que les fichiers
     get filesElements(){
         return this.files.filter(f => f.type !== TypeFileConstants.FOLDER)
     }
-
 }
 </script>
 <style scoped>

@@ -11,6 +11,6 @@
 
 <style scoped>
     .footer{
-        background-color:#EFEFEF;
+        background-color:#ffffff;
     }
 </style>

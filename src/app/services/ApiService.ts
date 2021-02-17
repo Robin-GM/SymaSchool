@@ -28,11 +28,12 @@ class ApiService{
       });
     }
   
-    async post<T = any>(url: string, data?: any): Promise<T> {
+    async post<T = any>(url: string, data?: any, params?: Record<string, any>): Promise<T> {
       return await this.perform<T>({
         method: HttpMethod.POST,
         url,
-        data
+        data,
+        params
       });
     }
   

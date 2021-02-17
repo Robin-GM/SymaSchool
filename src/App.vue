@@ -19,7 +19,6 @@
 import { Component, Vue} from "vue-property-decorator";
 import NavBar from '@/app/components/NavBar.vue'
 import FooterBar from '@/app/components/FooterBar.vue'
-import { authStoreModule } from "@/app/store/auth"
 
 @Component({
   components: {
@@ -39,7 +38,6 @@ export default class App extends Vue {
 
 <style scoped>
   #main{
-    background-color:#EFEFEF;
   }
 
 </style>
