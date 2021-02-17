@@ -19,6 +19,26 @@
                 </div>
             </div>
         </div>
+
+        <v-menu
+            v-model="showMenu"
+            :position-x="x"
+            :position-y="y"
+            absolute
+            offset-y
+        >
+            <v-list>
+                <v-list-item>
+                    <v-list-item-title>a</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title>b</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title>c</v-list-item-title>
+                </v-list-item>
+            </v-list>
+        </v-menu>
     </div>
 </template>
 <script lang="ts">
@@ -31,6 +51,26 @@ import { File } from "@/app/models/cloud/File"
 
 @Component
 export default class FileContainer extends Vue{
+
+    //Context Menu 
+    @Prop({ type: Boolean, required: true })
+    externShowMenu!: boolean;
+    showMenu = false;
+    x = 0;
+    y = 0;
+
+    show(e: any, file: File) {
+        console.log(file)
+        this.externShowMenu = false
+        e.preventDefault()
+        this.showMenu = false
+        this.x = e.clientX
+        this.y = e.clientY
+        this.$nextTick(() => {
+        this.showMenu = true
+        })
+        
+    }
 
     @Prop({ type: Object, required: true })
     readonly file!: File;

@@ -1,50 +1,56 @@
 <template>
     <div class="x">
 
-        <div class="zone">
-            <div class="zoneBtn">
-                <v-btn 
-                    @click="dialogNewDirectory = true" 
-                    class="btn text-capitalize px-2" 
-                    color="orange" 
-                    large
-                >
-                    Créer un Dossier
-                </v-btn>
+        
+        <div class="zoneBtn">
+            <v-btn 
+                @click="dialogNewDirectory = true" 
+                class="btn text-capitalize px-2" 
+                color="orange" 
+                large
+            >
+                Créer un Dossier
+            </v-btn>
 
-                <v-btn 
-                    class="btn text-capitalize px-2" 
-                    color="orange" 
-                    large
-                >
-                    Nouveau Fichier
-                </v-btn>
-            </div>
-
-
-            <p class="txt">Dossiers</p>
-
-            <div class="filesContains">
-                <FileContainer
-                    class="elt"
-                    @path="getNewPath"
-                    v-for="file in foldersElements"
-                    :key="file.name"
-                    :file="file"
-                />
-            </div>  
+            <v-btn 
+                class="btn text-capitalize px-2" 
+                color="orange" 
+                large
+            >
+                Nouveau Fichier
+            </v-btn>
         </div>
 
-        <div class="zone">
-            <p class="txt">Fichiers</p> 
+        <div class="zone" @contextmenu.stop="show($event, 'background')">
+            <div class="mb-5">
+                <p class="txt">Dossiers</p>
 
-            <div class="filesContains">
-                <FileContainer
-                    class="elt"
-                    v-for="file in filesElements"
-                    :key="file.name"
-                    :file="file"
-                />
+                <div class="filesContains" >
+                    <FileContainer
+                        class="elt"
+                        @path="getNewPath"
+                        v-for="file in foldersElements"
+                        :key="file.name"
+                        :file="file"
+                        :externShowMenu="showMenu"
+                        @contextmenu.stop.native="show($event, 'dossier', file)"
+                    />
+                </div>  
+            </div>
+
+            <div>
+                <p class="txt">Fichiers</p> 
+
+                <div class="filesContains" >
+                    <FileContainer
+                        class="elt"
+                        v-for="file in filesElements"
+                        :key="file.name"
+                        :file="file"
+                        :externShowMenu="showMenu"
+                        @contextmenu.stop.native="show($event, 'fichier', file)"
+                    />
+                </div>
             </div>
         </div>
         
@@ -87,6 +93,49 @@
                 </div>
             </v-card>
         </v-dialog>
+
+        <v-menu
+            v-model="showMenu"
+            :position-x="x"
+            :position-y="y"
+            absolute
+            offset-y
+        >
+            <v-list v-if="type == 'background'">
+                <v-list-item>
+                    <v-list-item-title>background</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title>background</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title>background</v-list-item-title>
+                </v-list-item>
+            </v-list>
+            <v-list v-else-if="type == 'dossier'">
+                <v-list-item>
+                    <v-list-item-title>dossier</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title>dossier</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title>dossier</v-list-item-title>
+                </v-list-item>
+            </v-list>
+            <v-list v-else-if="type == 'fichier'">
+                <v-list-item>
+                    <v-list-item-title>fichier</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title>fichier</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title>fichier</v-list-item-title>
+                </v-list-item>
+            </v-list>
+
+        </v-menu>
 
     </div>
 </template>
@@ -143,6 +192,23 @@ export default class Interface extends Vue{
     defaultDirName = "Dossier sans titre";
 
 
+    //Context Menu 
+    showMenu = false;
+    type = "";
+    x = 0;
+    y = 0;
+
+    show(e: any, type: string, file?: File) {
+        this.type = type;
+        console.log(file)
+        e.preventDefault();
+        this.showMenu = false;
+        this.x = e.clientX;
+        this.y = e.clientY;
+        this.$nextTick(() => {
+          this.showMenu = true;
+        });
+    }
 
     //Au chargement de la page, on appelle la fonction getFiles
     async mounted(){
