@@ -1,0 +1,4 @@
+Fichier : Déplacer vers / Ajouter aux favoris / Renommer / Télécharger / Supprimer / (Créer une copie)
+Dossier : Déplacer vers / Ajouter aux favoris / Renommer / Télécharger /Supprimer
+
+Background : Nouveau Dossier / Importer un fichier / Importer un dossier

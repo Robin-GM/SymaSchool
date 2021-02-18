@@ -8,6 +8,7 @@
                 class="btn text-capitalize px-2" 
                 color="orange" 
                 large
+                depressed
             >
                 Créer un Dossier
             </v-btn>
@@ -16,6 +17,7 @@
                 class="btn text-capitalize px-2" 
                 color="orange" 
                 large
+                depressed
             >
                 Nouveau Fichier
             </v-btn>
@@ -101,40 +103,14 @@
             absolute
             offset-y
         >
-            <v-list v-if="type == 'background'">
-                <v-list-item>
-                    <v-list-item-title>background</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                    <v-list-item-title>background</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                    <v-list-item-title>background</v-list-item-title>
-                </v-list-item>
-            </v-list>
-            <v-list v-else-if="type == 'dossier'">
-                <v-list-item>
-                    <v-list-item-title>dossier</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                    <v-list-item-title>dossier</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                    <v-list-item-title>dossier</v-list-item-title>
-                </v-list-item>
-            </v-list>
-            <v-list v-else-if="type == 'fichier'">
-                <v-list-item>
-                    <v-list-item-title>fichier</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                    <v-list-item-title>fichier</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                    <v-list-item-title>fichier</v-list-item-title>
-                </v-list-item>
-            </v-list>
-
+            <div v-if="type == 'background'">
+                <BackgroundMenu
+                    @openDialogNewDirectory="dialogNewDirectory = true"
+                />
+            </div>
+            <div v-else-if="type == 'dossier' || type === 'fichier'">
+                <FileMenu/>
+            </div>
         </v-menu>
 
     </div>
@@ -142,18 +118,23 @@
 <script lang="ts">
 import { Component, Watch, Emit, Prop, Vue} from "vue-property-decorator";
 
+import FileContainer from "@/app/components/Cloud/FileContainer.vue";
+import BackgroundMenu from "@/app/components/Cloud/Context Menu/BackgroundMenu.vue";
+import FileMenu from "@/app/components/Cloud/Context Menu/FileMenu.vue";
+
 
 import { errorService } from "@/app/services/ErrorService";
 import { rootStoreModule } from "@/app/store/root";
 
 import { File } from "@/app/models/cloud/File";
 import { cloudService} from "@/app/services/CloudService";
-import FileContainer from "@/app/components/Cloud/FileContainer.vue"
 import { TypeFileConstants } from "@/app/constants/Cloud/TypeFileConstants";
 
 @Component({
     components: {
         FileContainer,
+        BackgroundMenu,
+        FileMenu
   }
 })
 export default class Interface extends Vue{
@@ -161,7 +142,6 @@ export default class Interface extends Vue{
     //Prop qui prend en charge le retour arrière dans le path, reçoit sa valeur du composant parent 
     @Prop({ type: String, required: false })
     goBackDirectory!: string;
-
 
     //variable loading pour gérer les effets de chargement des composants
     loading = false;
