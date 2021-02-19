@@ -20,12 +20,18 @@ class CloudService {
         return await apiService.post(url, params)
     }
 
-    async uploadNewFile( file: object, path: string) {
-        const url = `${CloudService.ENDPOINT_CLOUD}/upload-file`;
-        const data = { file: file, path: path };
+    async uploadNewFile( files: object[], path: string) {
+        const url = `${CloudService.ENDPOINT_CLOUD}/upload-files`;
+        const data = { files: files, path: path };
         return await apiService.post(url, data)
     }
 
+    async delete(path: string) {
+        const url = `${CloudService.ENDPOINT_CLOUD}/delete`;
+        const params = new URLSearchParams();
+        params.append("path", path);
+        return await apiService.delete(url, params)
+    }
     
 
     //modifyName(dirName | fileName, newName)

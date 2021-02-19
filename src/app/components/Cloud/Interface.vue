@@ -103,13 +103,15 @@
             absolute
             offset-y
         >
-            <div v-if="type == 'background'">
+            <div v-if="typeContext == 'background'">
                 <BackgroundMenu
                     @openDialogNewDirectory="dialogNewDirectory = true"
                 />
             </div>
-            <div v-else-if="type == 'dossier' || type === 'fichier'">
-                <FileMenu/>
+            <div v-else-if="typeContext == 'dossier' || typeContext === 'fichier'">
+                <FileMenu
+                    :file="fileSelectedByContextMenu"
+                    @changeOccured="refreshTheInterface"/>
             </div>
         </v-menu>
 
@@ -168,19 +170,27 @@ export default class Interface extends Vue{
     //Nom du dossier à ajouter : valeur par défaut
     directoryName = "Dossier sans titre";
 
-    //valeur par défaut pour réinitialiser
-    defaultDirName = "Dossier sans titre";
-
 
     //Context Menu 
     showMenu = false;
-    type = "";
+    typeContext = "";
+    fileSelectedByContextMenu: File ={
+        name: "",
+        size: 0,
+        type: "",
+        path: "",
+    };
     x = 0;
     y = 0;
 
     show(e: any, type: string, file?: File) {
-        this.type = type;
-        console.log(file)
+        this.typeContext = type;
+
+        if(file != undefined){
+            this.fileSelectedByContextMenu = file;
+        }
+
+        console.log(this.fileSelectedByContextMenu)
         e.preventDefault();
         this.showMenu = false;
         this.x = e.clientX;
@@ -233,7 +243,7 @@ export default class Interface extends Vue{
             await cloudService.createDirectory(newDirPath)
 
             //on réinitialise la valeur de directoryName avec l'entrée par défaut
-            this.directoryName = this.defaultDirName;
+            this.resetDefaultDirectoryName();
         }catch (error) {
             const errorMessage = errorService.getErrorMessage(error);
             rootStoreModule.setErrorMessage(errorMessage);
@@ -241,17 +251,24 @@ export default class Interface extends Vue{
             this.loading = false;
             this.dialogNewDirectory = false;
             //on rafraichit la page pour que le dossier apparaisse
-            await this.getContent();
+            await this.refreshTheInterface();
         }
     }
 
+    async refreshTheInterface(){
+        await this.getContent();
+    }
+
+
+    resetDefaultDirectoryName(){
+        this.directoryName = "Dossier sans titre";
+    }
 
 
     //récupère du composant enfant le chemin du répertoire ou l'on souhaite se rendre, et instancie la variable newPath avec ce chemin
     getNewPath(filePath: string){
         this.newPath = filePath;
     }
-
 
 
     //S'active si la valeur de newPath change : signifie que l'on souhaite se rendre dans un autre répertoire
@@ -262,7 +279,6 @@ export default class Interface extends Vue{
             await this.getContent();
         }
     }
-
 
 
     //émet le nouveau path pour actualiser le path de navigation dans le composant parent

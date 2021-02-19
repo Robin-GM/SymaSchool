@@ -12,11 +12,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Prop, Emit, Vue } from "vue-property-decorator";
 import { mdiFolderMoveOutline, mdiStarOutline, mdiPencilOutline, mdiInformationOutline, mdiDownloadOutline, mdiTrashCanOutline} from '@mdi/js'; 
+
+import { errorService } from "@/app/services/ErrorService";
+import { rootStoreModule } from "@/app/store/root";
+
+import { File } from "@/app/models/cloud/File";
+import { cloudService} from "@/app/services/CloudService";
 
 @Component
 export default class FileMenu extends Vue {
+
+	//Prop qui récupère l'objet sur lequel le clique droit a été effectué
+    @Prop({ type: Object, required: false })
+    file!: File;
 
 	icons = {
         move : mdiFolderMoveOutline,
@@ -32,6 +42,25 @@ export default class FileMenu extends Vue {
 
     //Nom du dossier à ajouter : valeur par défaut
     directoryName = "Dossier sans titre";
+
+	async deleteElement(){
+		try{
+			console.log(this.file.path)
+            await cloudService.delete(this.file.path);
+        }catch (error) {
+            const errorMessage = errorService.getErrorMessage(error);
+            rootStoreModule.setErrorMessage(errorMessage);
+        }finally{
+			this.changeOccured();
+		}
+	}
+
+
+	//émet au parent quand un changement a lieu (permet d'actualiser la page)
+	@Emit("changeOccured")
+	changeOccured(){
+		return;
+	}
 }
 </script>
 

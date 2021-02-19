@@ -4,5 +4,6 @@ export class File {
       public size: number,
       public type: string,
       public path: string,
+      public historicPath?: string,
     ) {}
   }

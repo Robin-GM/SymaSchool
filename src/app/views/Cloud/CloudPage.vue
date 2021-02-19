@@ -2,7 +2,7 @@
     <div class="parent">
 
         <div class="navigation">
-            
+            <NavigationMenuSide/>
         </div>
 
         <div class="main">
@@ -41,10 +41,12 @@ import { RouteNameConstants } from "@/app/constants/RouteNameConstants";
 import { mdiChevronRight } from '@mdi/js'; 
 
 import Interface from '@/app/components/Cloud/Interface.vue'
+import NavigationMenuSide from '@/app/components/Cloud/NavigationMenuSide.vue'
 
 @Component({
   components: {
-    Interface
+    Interface,
+    NavigationMenuSide
   }
 })
 export default class CloudPage extends Vue{
@@ -118,6 +120,7 @@ export default class CloudPage extends Vue{
     .navigation{
         height: 110%;
         width: 255px;
+        background-color: bisque;
     }
     .main{
         height: 100%;

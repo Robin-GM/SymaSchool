@@ -48,7 +48,7 @@ const routes: RouteConfig[] = [
     component: UserSelectedProfilePage
   },
   {
-    path: '/cloud-page',
+    path: '/cloud',
     name: RouteNameConstants.CLOUD_PAGE,
     component: CloudPage
   },
